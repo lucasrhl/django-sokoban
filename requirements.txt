@@ -1,0 +1,6 @@
+distlib==0.3.6
+filelock==3.9.0
+platformdirs==2.6.2
+psycopg2-binary==2.9.5
+python-environ==0.4.54
+virtualenv==20.17.1
