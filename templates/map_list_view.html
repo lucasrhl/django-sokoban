@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Sokoban
+{% endblock %}
+
+{% block body_content %}
+    <div class="row m-2" style="flex-direction: row-reverse;">
+        <a class="col-sm-12 col-md-2 btn btn-secondary" href="{% url "logout" %}">Déconnexion</a>
+    </div>
+
+    <div class="container">
+    </div>
+{% endblock %}
+
+{% block js_content %}
+    <script>
+        let result = "<div class='row ligne-lvl'>";
+
+        $(function() {
+            {# Créé la liste des niveaux existant en mettant 3 niveaux par ligne #}
+            {% for object in object_list %}
+                    {% if object.id|divisibleby:4 %}
+                        result +=   '</div>' +
+                                    '<div class="row ligne-lvl">' +
+                                        '<a class="col-3 lvl border border-dark rounded" href="{% url 'map' object.id %}">' +
+                                                '{{ object.id }}' +
+                                        '</a>';
+                    {% else %}
+                        result += '<a class="col-3 lvl border border-dark rounded" href="{% url 'map' object.id %}">' +
+                                        '{{ object.id }}' +
+                                    '</a>';
+
+                    {% endif %}
+            {% endfor %}
+
+            result += '</div>';
+            $('.container').html(result);
+        });
+    </script>
+{% endblock %}

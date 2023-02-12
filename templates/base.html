@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}{% endblock %}</title>
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap.rtl.css' %}">
+        <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap-grid.css' %}">
+        <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap-grid.rtl.css' %}">
+        <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap-reboot.css' %}">
+        <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap-reboot.rtl.css' %}">
+        <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap-utilities.css' %}">
+        <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap-utilities.rtl.css' %}">
+        <!-- CSS custom -->
+        <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    </head>
+    <body>
+        {% block body_content %}
+        {% endblock %}
+
+        <!-- jQuery -->
+        <script src="{% static 'jquery-3.6.1.min.js' %}"></script>
+        <!-- Boostrap -->
+        <script src="{% static 'bootstrap-5.0.2-dist/js/bootstrap.bundle.js' %}"></script>
+        <script src="{% static 'bootstrap-5.0.2-dist/js/bootstrap.esm.js' %}"></script>
+        <script src="{% static 'bootstrap-5.0.2-dist/js/bootstrap.js' %}"></script>
+
+        {% block js_content %}
+        {% endblock %}
+    </body>
+</html>

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Sokoban
+{% endblock %}
+
+{% block body_content %}
+    <img src="/static/img/sokoban_fond_ecran.png">
+    <div class="row" style="justify-content: center; padding-block-start: 15rem;">
+        <div class="col-3" style="display: flex; justify-content: center;">
+            <a class="btn btn-primary" href="{% url 'login' %}">Connexion</a><br>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js_content %}
+    <script>
+        $(function() {
+            $('body').css("overflow", "hidden");
+            $('img').css({"width": window.innerWidth, "height": window.innerHeight});
+            $('img').css({"position": "absolute", "z-index": "-999"});
+        });
+    </script>
+{% endblock %}

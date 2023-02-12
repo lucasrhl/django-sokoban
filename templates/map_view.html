@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Sokoban
+{% endblock %}
+
+{% block body_content %}
+    <button class="btn btn-secondary m-2" onclick="LoadGameContent()">Recommencer</button>
+    <div class="container game-content">
+    </div>
+{% endblock %}
+
+{% block js_content %}
+    <script>
+        let nb_item_cible,
+            content;
+
+        {# Génère la map #}
+        function LoadGameContent() {
+            {# Vide le container #}
+            $(".game-content").html("");
+
+            {# Créé une nouvelle ligne à chaque nouvel index #}
+            for (let i = 0; i < content.length; i++) {
+
+                {# Créé l'item en fonction du contenu de la base de donnée #}
+                $(".game-content").append("<div class='row ligne-item ligne-" + i + "'></div>");
+                for (let j = 0; j < content[i].length; j++) {
+                    switch (content[i][j]) {
+                        case "M":
+                            $(".ligne-" + i).append("<div class='col-1 item-content mur' data-x='" + j + "' data-y='" + i + "' data-type='mur'><img class='item' src='/static/img/mur_sokoban.jpg' %}'></div>");
+                            break;
+                        case "V":
+                            $(".ligne-" + i).append("<div class='col-1 item-content'></div>");
+                            break;
+                        case "@":
+                            $(".ligne-" + i).append("<div class='col-1 item-content player' data-x='" + j + "' data-y='" + i + "'><img class='item' src='/static/img/player_sokoban.ico'></div>");
+                            break;
+                        case ".":
+                            $(".ligne-" + i).append("<div class='col-1 item-content zone' data-x='" + j + "' data-y='" + i + "' data-type='zone'><img class='item' src='/static/img/zone_sokoban.png'></div>");
+                            break;
+                        case "$":
+                            $(".ligne-" + i).append("<div class='col-1 item-content box' data-x='" + j + "' data-y='" + i + "' data-type='box'><img class='item' src='/static/img/box_sokoban.jpg'></div>");
+                            break;
+                        case ".$":
+                            $(".ligne-" + i).append("<div class='col-1 item-content zone' data-x='" + j + "' data-y='" + i + "' data-type='zone' style='position: absolute;'><img class='item' src='/static/img/zone_sokoban.png'></div>" +
+                                "<div class='col-1 item-content box box-valide' data-x='" + j + "' data-y='" + i + "' data-type='box'><img class='item' src='/static/img/box_sokoban.jpg'></div>");
+                            break;
+                    }
+                }
+            }
+        }
+
+        {# Déplace sur l'axe X #}
+        function DeplacementX(x_cible, y_cible, operateur, item_cible) {
+            {# Identifie l'élément ciblé #}
+            if ($(item_cible).length > 1) // Si l'élément ciblé comporte deux item récupère seulement la box
+                ($(item_cible[0]).attr("data-type") == 'zone') ? item_cible = item_cible[1] : item_cible = item_cible[0];
+            switch ($(item_cible).attr("data-type")) {
+                case 'mur':
+                    break;
+                case undefined:
+                case 'zone':
+                    $(".player").attr("data-x", x_cible);
+                    $(".player").animate({
+                        left: operateur + $(".item-content").css("width")
+                    });
+                    break;
+                case 'box':
+                    if (operateur == "-=") {
+                        DeplacementBoxX(y_cible, x_cible, x_cible - 1, operateur, item_cible);
+                    }
+                    else {
+                        DeplacementBoxX(y_cible, x_cible, x_cible + 1, operateur, item_cible);
+                    }
+                    break;
+            }
+        }
+
+        {# Déplace sur l'axe Y #}
+        function DeplacementY(x_cible, y_cible, operateur, item_cible) {
+            {# Identifie l'élément ciblé #}
+            if ($(item_cible).length > 1) // Si l'élément ciblé comporte deux item récupère seulement la box
+                ($(item_cible[0]).attr("data-type") == 'zone') ? item_cible = item_cible[1] : item_cible = item_cible[0];
+                $(item_cible).removeClass("box-valide");
+
+            switch ($(item_cible).attr("data-type")) {
+                case 'mur':
+                    break;
+                case 'zone':
+                case undefined:
+                    $(".player").attr("data-y", y_cible);
+                    $(".player").animate({
+                        top: operateur + $(".item-content").css("height")
+                    });
+                    break;
+                case 'box':
+                    if (operateur == "-=") {
+                        DeplacementBoxY(x_cible, y_cible, y_cible - 1, operateur, item_cible, nb_item_cible);
+                    }
+                    else {
+                        DeplacementBoxY(x_cible, y_cible, y_cible + 1, operateur, item_cible, nb_item_cible);
+                    }
+                    break;
+            }
+        }
+
+        {# Identifie l'élément cible de la box sur l'axe X #}
+        function DeplacementBoxX(y_cible, x_cible, x_cible2, operateur, item_cible) {
+            let item_cible_2 = $(".game-content").find("[data-x='" + x_cible2 + "'][data-y='" + y_cible + "']");
+            switch ($(item_cible_2).attr("data-type")) {
+                case 'mur':
+                case 'box':
+                    break;
+                case 'zone':
+                    $(item_cible).addClass("box-valide");
+                case 'zone':
+                case undefined:
+                    if (nb_item_cible > 1)
+                        $(item_cible).removeClass("box-valide");
+
+                    $(item_cible).attr("data-x", x_cible2);
+                    $(".player").attr("data-x", x_cible);
+                    $(item_cible).animate({
+                        left: operateur + $(".item-content").css("width")
+                    });
+                    $(".player").animate({
+                        left: operateur + $(".item-content").css("width")
+                    });
+                    break;
+            }
+        }
+
+        {# Identifie l'élément cible de la box sur l'axe Y #}
+        function DeplacementBoxY(x_cible, y_cible, y_cible2, operateur, item_cible) {
+            let item_cible_2 = $(".game-content").find("[data-x='" + x_cible + "'][data-y='" + y_cible2 + "']");
+            switch ($(item_cible_2).attr("data-type")) {
+                case 'mur':
+                case 'box':
+                    break;
+                case 'zone':
+                    $(item_cible).addClass("box-valide");
+                case 'zone':
+                case undefined:
+                    if (nb_item_cible > 1)
+                        $(item_cible).removeClass("box-valide");
+
+                    $(item_cible).attr("data-y", y_cible2);
+                    $(".player").attr("data-y", y_cible);
+                    $(item_cible).animate({
+                        top: operateur + $(".item-content").css("height")
+                    });
+                    $(".player").animate({
+                        top: operateur + $(".item-content").css("height")
+                    });
+                    break;
+            }
+        }
+
+        $(function() {
+            {# Récupère le contenu de l'objet map #}
+            content = ("{{ object.content }}").split(";");
+
+            {# Transforme le contenu de l'objet map en tableau #}
+            for (let i = 0; i < content.length; i++) {
+                content[i] = content[i].split(",");
+            }
+            LoadGameContent();
+
+            {# Identifie la flèche choisi #}
+            $(document).keydown(function(e){
+                if (!$(".player").is(":animated")) {
+                    let x = parseInt($(".player").attr("data-x")),
+                        y = parseInt($(".player").attr("data-y")),
+                        item_cible;
+                    switch (e.which) {
+                        case 37:    // flèche gauche
+                            item_cible      = $(".game-content").find("[data-x='" + (x-1) + "'][data-y='" + y + "']");
+                            nb_item_cible   = item_cible.length;
+                            DeplacementX(x - 1, y, "-=", item_cible);
+                            break;
+                        case 38:    // flèche haut
+                            item_cible      = $(".game-content").find("[data-x='" + x + "'][data-y='" + (y-1) + "']");
+                            nb_item_cible   = item_cible.length;
+                            DeplacementY(x, y - 1, "-=", item_cible);
+                            break;
+                        case 39:    // flèche droite
+                            item_cible      = $(".game-content").find("[data-x='" + (x+1) + "'][data-y='" + y + "']");
+                            nb_item_cible   = item_cible.length;
+                            DeplacementX(x + 1, y, "+=", item_cible);
+                            break;
+                        case 40:    // flèche du bas
+                            item_cible      = $(".game-content").find("[data-x='" + x + "'][data-y='" + (y+1) + "']");
+                            nb_item_cible   = item_cible.length;
+                            DeplacementY(x, y + 1, "+=", item_cible);
+                            break;
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
